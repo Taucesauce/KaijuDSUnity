@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
+
 public class UIController : MonoBehaviour {
     //Class variables
     private Sprite currentEmote;
@@ -10,6 +11,13 @@ public class UIController : MonoBehaviour {
     private Text turnText;
     private Text turnsRemainingText;
     private Text scoreText;
+    private GameObject statusIcon;
+    private GameObject statusBanner;
+    private GameObject friendMeter;
+    private GameObject enemyMeter;
+    private GameObject soulMeter;
+    private GameObject leftCursor;
+    private GameObject rightCursor;
 
     void Start() {
         //Grab the objects from the game and assign them to class vars.
@@ -19,14 +27,17 @@ public class UIController : MonoBehaviour {
         turnText = currentTurn.GetComponent<Text>();
         GameObject turnsRemaining = GameObject.Find("TurnsRemaining");
         turnsRemainingText = turnsRemaining.GetComponent<Text>();
-        GameObject score = GameObject.Find("Score");
-        scoreText = score.GetComponent<Text>();
-
+        statusIcon = GameObject.Find("Icon");
+        statusBanner = GameObject.Find("Banner");
+        friendMeter = GameObject.Find("FriendMeter");
+        enemyMeter = GameObject.Find("EnemyMeter");
+        soulMeter = GameObject.Find("SoulmateMeter");
+        leftCursor = GameObject.Find("LeftCursor");
+        rightCursor = GameObject.Find("RightCursor");
     }
 
     void Update() {
-        scoreText.text = GameController.currentRelationshipScore.ToString();
-        //TODO: Move icon to correct position on meter and update which meter sprite is used.
+
     }
 
     //Methods to toggle emote menu display.
@@ -71,7 +82,8 @@ public class UIController : MonoBehaviour {
             //Can potentially move this from inside of UIController to in Editor OnClick().
             GameController.nextPlayerTurn();
             turnText.text = "Player 2's Turn";
-            turnsRemainingText.text = "Turns Remaining: " + GameController.turnsRemaining; 
+            turnsRemainingText.text = "Turns Remaining: " + GameController.turnsRemaining;
+            updateStatusBar(); 
         }
     }
 
@@ -90,6 +102,23 @@ public class UIController : MonoBehaviour {
             GameController.nextPlayerTurn();
             turnText.text = "Player 1's Turn";
             turnsRemainingText.text = "Turns Remaining: " + GameController.turnsRemaining;
+            updateStatusBar();
+        }
+    }
+
+    private void updateStatusBar() {
+        if(GameController.currentRelationshipScore < -1) {
+            enemyMeter.SetActive(true);
+            friendMeter.SetActive(false);
+            soulMeter.SetActive(false);
+        } else if (GameController.currentRelationshipScore > 1) {
+            enemyMeter.SetActive(false);
+            friendMeter.SetActive(false);
+            soulMeter.SetActive(true);
+        } else {
+            enemyMeter.SetActive(false);
+            friendMeter.SetActive(true);
+            soulMeter.SetActive(false);
         }
     }
 }
