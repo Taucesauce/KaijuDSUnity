@@ -9,22 +9,41 @@ public class PlayerController : MonoBehaviour {
     private GameObject bilton;
     private static PlayerType gobzillaType = PlayerType.childish;
     private static PlayerType biltonType = PlayerType.tsundere;
+    private Sprite[] gobzillaSprites = new Sprite[6];
+    private Sprite[] biltonSprites = new Sprite[6];
 
     // Use this for initialization
     void Start () {
         gobzilla = GameObject.Find("Gobzilla");
         bilton = GameObject.Find("Bilton");
+
+        int arrayIndex = 0;
+        //Load corresponding sprites for Gobzilla and sort into array.
+        foreach (string name in Emote.GetNames(typeof(Emote))) {
+                string iconName = "GobzillaEmotes/Gobzilla" + name;
+                Sprite iconSprite = Resources.Load<Sprite>(iconName);
+                gobzillaSprites[arrayIndex] = iconSprite;
+                arrayIndex++;
+        }
+        arrayIndex = 0;
+        //Load corresponding sprites for Gobzilla and sort into array.
+        foreach (string name in Emote.GetNames(typeof(Emote))) {
+            string iconName = "BiltonEmotes/Bilton" + name;
+            Sprite iconSprite = Resources.Load<Sprite>(iconName);
+            biltonSprites[arrayIndex] = iconSprite;
+            arrayIndex++;
+        }
     }
 
     //Methods for setting player sprite reactions.
-    public void setGobzillaSprite(Sprite sprite) {
+    public void setGobzillaSprite(int emote) {
         SpriteRenderer rend = gobzilla.GetComponent<SpriteRenderer>();
-        rend.sprite = sprite;
+        rend.sprite = gobzillaSprites[emote];
     }
 
-    public void setBiltonSprite(Sprite sprite) {
+    public void setBiltonSprite(int emote) {
         SpriteRenderer rend = bilton.GetComponent<SpriteRenderer>();
-        rend.sprite = sprite;
+        rend.sprite = biltonSprites[emote];
     }
 
     public void setGobzillaType(PlayerType type) {
