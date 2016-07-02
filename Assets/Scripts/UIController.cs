@@ -4,14 +4,33 @@ using System.Collections;
 
 
 public class UIController : MonoBehaviour {
-    //Class variables
+    //Class variables:
+
+    //Button variables
     private Emote currentEmote;
     private GameObject p1Button;
     private GameObject p2Button;
+
+    //StatusBar variables
     private SpriteRenderer iconRend;
     private SpriteRenderer bannerRend;
+    private SpriteRenderer meterRend;
+
+    private Sprite enemyIcon;
+    private Sprite enemyBanner;
+    private Sprite enemyMeter;
+    private Sprite friendIcon;
+    private Sprite friendBanner;
+    private Sprite friendMeter;
+    private Sprite soulmateIcon;
+    private Sprite soulmateBanner;
+    private Sprite soulmateMeter;
+
+    //Game Text UI Variables
     private Text turnText;
     private Text turnsRemainingText;
+
+    //Sprites for menu wheel
     private Sprite[] menuSprites = new Sprite[6];
 
     void Start() {
@@ -26,6 +45,8 @@ public class UIController : MonoBehaviour {
         iconRend = iconObject.GetComponent<SpriteRenderer>();
         GameObject bannerObject = GameObject.Find("BannerObject");
         bannerRend = bannerObject.GetComponent<SpriteRenderer>();
+        GameObject meterObject = GameObject.Find("Meter");
+        meterRend = meterObject.GetComponent<SpriteRenderer>();
 
         int arrayIndex = 1;
         //Load corresponding sprites for menu buttons and sort into array.
@@ -37,6 +58,17 @@ public class UIController : MonoBehaviour {
                 arrayIndex++;
             }
         }
+
+        //Load in StatusBar UI sprites
+        enemyIcon = Resources.Load<Sprite>("StatusBar/Icons/enemyIcon");
+        enemyBanner = Resources.Load<Sprite>("StatusBar/Banner/enemyBanner");
+        enemyMeter = Resources.Load<Sprite>("StatusBar/Meter/enemyMeter");
+        friendIcon = Resources.Load<Sprite>("StatusBar/Icons/friendIcon");
+        friendMeter = Resources.Load<Sprite>("StatusBar/Meter/friendMeter");
+        friendBanner = Resources.Load<Sprite>("StatusBar/Banner/friendBanner");
+        soulmateIcon = Resources.Load<Sprite>("StatusBar/Icons/soulmateIcon");
+        soulmateBanner = Resources.Load<Sprite>("StatusBar/Banner/soulmateBanner");
+        soulmateMeter = Resources.Load<Sprite>("StatusBar/Meter/soulmateMeter");
     }
 
     void Update() {
@@ -112,11 +144,17 @@ public class UIController : MonoBehaviour {
 
     private void updateStatusBar() {
         if(GameController.currentRelationshipScore < -1) {
-            iconRend.sprite = Resources.Load<Sprite>("StatusBar/Icons/enemyIcon");
-            bannerRend.sprite = Resources.Load<Sprite>("StatusBar/Banner/enemyBanner");
+            iconRend.sprite = enemyIcon;
+            bannerRend.sprite = enemyBanner;
+            meterRend.sprite = enemyMeter;
         } else if (GameController.currentRelationshipScore > 1) {
-            iconRend.sprite = Resources.Load<Sprite>("StatusBar/Icons/soulmateIcon");
-            bannerRend.sprite = Resources.Load<Sprite>("StatusBar/Banner/soulmateBanner");
+            iconRend.sprite = soulmateIcon;
+            bannerRend.sprite = soulmateBanner;
+            meterRend.sprite = soulmateMeter;
+        } else {
+            iconRend.sprite = friendIcon;
+            bannerRend.sprite = friendBanner;
+            meterRend.sprite = friendMeter;
         }
     }
 }
