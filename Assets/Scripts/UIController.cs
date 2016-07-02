@@ -26,6 +26,9 @@ public class UIController : MonoBehaviour {
     private Sprite soulmateBanner;
     private Sprite soulmateMeter;
 
+    private GameObject leftCursor;
+    private GameObject rightCursor;
+
     //Game Text UI Variables
     private Text turnText;
     private Text turnsRemainingText;
@@ -47,6 +50,8 @@ public class UIController : MonoBehaviour {
         bannerRend = bannerObject.GetComponent<SpriteRenderer>();
         GameObject meterObject = GameObject.Find("Meter");
         meterRend = meterObject.GetComponent<SpriteRenderer>();
+        leftCursor = GameObject.Find("LeftCursor");
+        rightCursor = GameObject.Find("RightCursor");
 
         int arrayIndex = 1;
         //Load corresponding sprites for menu buttons and sort into array.
@@ -72,7 +77,8 @@ public class UIController : MonoBehaviour {
     }
 
     void Update() {
-
+        leftCursor.transform.position = new Vector2(meterRend.bounds.min.x, leftCursor.transform.position.y);
+        rightCursor.transform.position = new Vector2(meterRend.bounds.max.x, leftCursor.transform.position.y);
     }
 
     //Methods to toggle emote menu display.
@@ -109,7 +115,6 @@ public class UIController : MonoBehaviour {
         if(GameController.isP1Turn && currentEmote != Emote.neutral) {
             //Update UI image
             Button button = p1Button.GetComponent<Button>();
-            Debug.Log(menuSprites[(int)currentEmote].name);
             button.image.sprite = menuSprites[(int)currentEmote];
             //Update player-based variables.
             PlayerController.emoteResponse(PlayerController.Emote.happy);
