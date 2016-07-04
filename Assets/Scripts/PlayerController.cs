@@ -5,12 +5,18 @@ public class PlayerController : MonoBehaviour {
     public enum PlayerType { childish, loving, tsundere };
     public enum Emote { neutral, happy, sad, wow, angry, heart };
 
-    private GameObject gobzilla;
-    private GameObject bilton;
+    private static GameObject gobzilla;
+    private static GameObject bilton;
     private static PlayerType gobzillaType = PlayerType.childish;
     private static PlayerType biltonType = PlayerType.tsundere;
-    private Sprite[] gobzillaSprites = new Sprite[6];
-    private Sprite[] biltonSprites = new Sprite[6];
+    public static Emote gobzillaEmote;
+    public static Emote biltonEmote;
+    private static Sprite[] gobzillaSprites = new Sprite[6];
+    private static Sprite[] biltonSprites = new Sprite[6];
+
+    private static int[] childishResponses = new int[] { 0, 1, 1, -1, 0, -1 };
+    private static int[] lovingResponses = new int[] { 0, -1, 1, 0, 1, -1 };
+    private static int[] tsundereResponses = new int[] { 0, 0, 1, -1, 1, -1 };
 
     // Use this for initialization
     void Start () {
@@ -36,12 +42,12 @@ public class PlayerController : MonoBehaviour {
     }
 
     //Methods for setting player sprite reactions.
-    public void setGobzillaSprite(int emote) {
+    public static void setGobzillaSprite(int emote) {
         SpriteRenderer rend = gobzilla.GetComponent<SpriteRenderer>();
         rend.sprite = gobzillaSprites[emote];
     }
 
-    public void setBiltonSprite(int emote) {
+    public static void setBiltonSprite(int emote) {
         SpriteRenderer rend = bilton.GetComponent<SpriteRenderer>();
         rend.sprite = biltonSprites[emote];
     }
@@ -55,27 +61,31 @@ public class PlayerController : MonoBehaviour {
     }
 
     //Matches a player's type to its corresponding reaction value.
-    public static void emoteResponse(Emote emote) {
-        int response = 1;
+    public static void emoteResponse(int emote) {
+        int response = 0;
+        bool isP1Turn = GameController.isP1Turn;
+
         PlayerType playerType;
 
-        if(GameController.isP1Turn) {
+        if(isP1Turn) {
             playerType = biltonType;
         } else {
             playerType = gobzillaType;
         }
 
-        //TODO: Incorporate player type key/value arrays to assign response value.
         //Find corresponding value of this given reaction based on type.
         switch(playerType) {
             case PlayerType.childish:
-                response = 1;
+                response = childishResponses[(int)emote];
+                updateSprites(response, isP1Turn);
                 break;
             case PlayerType.loving:
-                response = 1;
+                response = lovingResponses[(int)emote];
+                updateSprites(response, isP1Turn);
                 break;
             case PlayerType.tsundere:
-                response = 1;
+                response = tsundereResponses[(int)emote];
+                updateSprites(response, isP1Turn);
                 break;
             default:
                 break;
@@ -83,5 +93,16 @@ public class PlayerController : MonoBehaviour {
 
         //Update the current score.
         GameController.updateScore(response);
+    }
+
+    private static void updateSprites(int response, bool isP1Turn) {
+        if (isP1Turn) {
+            setBiltonSprite(response);
+            biltonEmote = (Emote)response;
+        }
+        else {
+            setGobzillaSprite(response);
+            gobzillaEmote = (Emote)response;
+        }
     }
 }

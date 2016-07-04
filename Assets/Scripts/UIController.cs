@@ -62,6 +62,9 @@ public class UIController : MonoBehaviour {
                 menuSprites[arrayIndex] = iconSprite;
                 arrayIndex++;
             }
+            else {
+                menuSprites[0] = Resources.Load<Sprite>("Emotes/happy_emote");
+            }
         }
 
         //Load in StatusBar UI sprites
@@ -79,6 +82,8 @@ public class UIController : MonoBehaviour {
     void Update() {
         leftCursor.transform.position = new Vector2(meterRend.bounds.min.x, leftCursor.transform.position.y);
         rightCursor.transform.position = new Vector2(meterRend.bounds.max.x, leftCursor.transform.position.y);
+        setP1Button((int)PlayerController.gobzillaEmote);
+        setP2Button((int)PlayerController.biltonEmote);
     }
 
     //Methods to toggle emote menu display.
@@ -109,15 +114,23 @@ public class UIController : MonoBehaviour {
         currentEmote = (Emote)emote;
     }
 
+    public void setP1Button(int emote) {
+        Button button = p1Button.GetComponent<Button>();
+        button.image.sprite = menuSprites[emote];
+    }
+
+    public void setP2Button(int emote) {
+        Button button = p2Button.GetComponent<Button>();
+        button.image.sprite = menuSprites[emote];
+    }
     //TODO: Separate concern.
     public void setP1Sprite() {
         //Make sure it's the correct player's turn.
         if(GameController.isP1Turn && currentEmote != Emote.neutral) {
             //Update UI image
-            Button button = p1Button.GetComponent<Button>();
-            button.image.sprite = menuSprites[(int)currentEmote];
+            setP1Button((int)currentEmote);
             //Update player-based variables.
-            PlayerController.emoteResponse(PlayerController.Emote.happy);
+            PlayerController.emoteResponse((int)currentEmote);
             currentEmote = Emote.neutral;
             //Update game logic dependent variables.
             //Can potentially move this from inside of UIController to in Editor OnClick().
@@ -133,10 +146,9 @@ public class UIController : MonoBehaviour {
         //Make sure it's the correct player's turn
         if (!GameController.isP1Turn && currentEmote != Emote.neutral) {
             //Update UI image
-            Button button = p2Button.GetComponent<Button>();
-            button.image.sprite = menuSprites[(int)currentEmote];
+            setP2Button((int)currentEmote);
             //Update player-based variables.
-            PlayerController.emoteResponse(PlayerController.Emote.happy);
+            PlayerController.emoteResponse((int)currentEmote);
             currentEmote = Emote.neutral;
             //Update game logic dependent variables.
             //Can potentially move this from inside of UIController to in Editor OnClick().
