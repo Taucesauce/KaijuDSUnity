@@ -14,9 +14,9 @@ public class PlayerController : MonoBehaviour {
     private static Sprite[] gobzillaSprites = new Sprite[6];
     private static Sprite[] biltonSprites = new Sprite[6];
 
-    private static int[] childishResponses = new int[] { 0, 1, 1, -1, 0, -1 };
-    private static int[] lovingResponses = new int[] { 0, -1, 1, 0, 1, -1 };
-    private static int[] tsundereResponses = new int[] { 0, 0, 1, -1, 1, -1 };
+    private static int[] childishResponses = new int[] { 0, 1, 5, 2, 3, 4 };
+    private static int[] lovingResponses = new int[] { 0, 4, 1, 3, 5, 2 };
+    private static int[] tsundereResponses = new int[] { 0, 3, 1, 4, 1, 2 };
 
     // Use this for initialization
     void Start () {
@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour {
 
     public static void setBiltonSprite(int emote) {
         SpriteRenderer rend = bilton.GetComponent<SpriteRenderer>();
+        Debug.Log(emote);
         rend.sprite = biltonSprites[emote];
     }
 
@@ -76,16 +77,16 @@ public class PlayerController : MonoBehaviour {
         //Find corresponding value of this given reaction based on type.
         switch(playerType) {
             case PlayerType.childish:
-                response = childishResponses[(int)emote];
-                updateSprites(response, isP1Turn);
+                response = calculateValue(emote);
+                updateSprites(childishResponses[(int)emote], isP1Turn);
                 break;
             case PlayerType.loving:
-                response = lovingResponses[(int)emote];
-                updateSprites(response, isP1Turn);
+                response = calculateValue(emote);
+                updateSprites(lovingResponses[emote], isP1Turn);
                 break;
             case PlayerType.tsundere:
-                response = tsundereResponses[(int)emote];
-                updateSprites(response, isP1Turn);
+                response = calculateValue(emote);
+                updateSprites(tsundereResponses[(int)emote], isP1Turn);
                 break;
             default:
                 break;
@@ -103,6 +104,23 @@ public class PlayerController : MonoBehaviour {
         else {
             setGobzillaSprite(response);
             gobzillaEmote = (Emote)response;
+        }
+    }
+
+    private static int calculateValue(int emote) {
+        switch(emote) {
+            case 1:
+                return 1;
+            case 2:
+                return -1;
+            case 3:
+                return 1;
+            case 4:
+                return -2;
+            case 5:
+                return 2;
+            default:
+                return 0;
         }
     }
 }
