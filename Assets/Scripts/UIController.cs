@@ -6,6 +6,10 @@ using System.Collections;
 public class UIController : MonoBehaviour {
     //Class variables:
 
+    public GameObject gameWrapper;
+    public GameObject endWrapper;
+    private static bool gameDisplayed = false;
+
     //Button variables
     private Emote currentEmote;
     private GameObject p1Button;
@@ -37,6 +41,34 @@ public class UIController : MonoBehaviour {
     private Sprite[] menuSprites = new Sprite[6];
 
     void Start() {
+        gameDisplayed = false;
+    }
+
+    void Update() {
+        if((int)PlayerController.gobzillaType != (int)PlayerType.unassigned && 
+            (int)PlayerController.biltonType != (int)PlayerType.unassigned && !gameDisplayed) {
+            displayGame();
+            gameDisplayed = true;
+        } else if(GameController.turnsRemaining == 0) {
+            displayEnd();
+        }
+    }
+
+    void displayEnd() {
+        gameWrapper.SetActive(false);
+        endWrapper.SetActive(true);
+    }
+
+    void displayGame() {
+        gameWrapper.SetActive(true);
+        setVariables();
+    }
+
+    public static void resetUI() {
+        gameDisplayed = false;
+    }
+
+    void setVariables() {
         //Grab the objects from the game and assign them to class vars.
         p1Button = GameObject.Find("P1EmoteMenuButton");
         p2Button = GameObject.Find("P2EmoteMenuButton");
@@ -56,7 +88,7 @@ public class UIController : MonoBehaviour {
         int arrayIndex = 1;
         //Load corresponding sprites for menu buttons and sort into array.
         foreach (string name in Emote.GetNames(typeof(Emote))) {
-            if(name != "neutral") {
+            if (name != "neutral") {
                 string iconName = "Emotes/" + name + "_emote";
                 Sprite iconSprite = Resources.Load<Sprite>(iconName);
                 menuSprites[arrayIndex] = iconSprite;
@@ -77,13 +109,6 @@ public class UIController : MonoBehaviour {
         soulmateIcon = Resources.Load<Sprite>("StatusBar/Icons/soulmateIcon");
         soulmateBanner = Resources.Load<Sprite>("StatusBar/Banner/soulmateBanner");
         soulmateMeter = Resources.Load<Sprite>("StatusBar/Meter/soulmateMeter");
-    }
-
-    void Update() {
-        leftCursor.transform.position = new Vector2(meterRend.bounds.min.x, leftCursor.transform.position.y);
-        rightCursor.transform.position = new Vector2(meterRend.bounds.max.x, leftCursor.transform.position.y);
-        setP1Button((int)PlayerController.gobzillaEmote);
-        setP2Button((int)PlayerController.biltonEmote);
     }
 
     //Methods to toggle emote menu display.
@@ -130,12 +155,12 @@ public class UIController : MonoBehaviour {
             //Update UI image
             setP1Button((int)currentEmote);
             //Update player-based variables.
-            PlayerController.emoteResponse((int)currentEmote);
+            setP2Button(PlayerController.emoteResponse((int)currentEmote));
             currentEmote = Emote.neutral;
             //Update game logic dependent variables.
             //Can potentially move this from inside of UIController to in Editor OnClick().
             GameController.nextPlayerTurn();
-            turnText.text = "Player 2's Turn";
+            turnText.text = "Bilton's Turn";
             turnsRemainingText.text = "Turns Remaining: " + GameController.turnsRemaining;
             updateStatusBar(); 
         }
@@ -148,12 +173,11 @@ public class UIController : MonoBehaviour {
             //Update UI image
             setP2Button((int)currentEmote);
             //Update player-based variables.
-            PlayerController.emoteResponse((int)currentEmote);
+            setP1Button(PlayerController.emoteResponse((int)currentEmote));
             currentEmote = Emote.neutral;
             //Update game logic dependent variables.
-            //Can potentially move this from inside of UIController to in Editor OnClick().
             GameController.nextPlayerTurn();
-            turnText.text = "Player 1's Turn";
+            turnText.text = "Gobzilla's Turn";
             turnsRemainingText.text = "Turns Remaining: " + GameController.turnsRemaining;
             updateStatusBar();
         }
@@ -173,5 +197,7 @@ public class UIController : MonoBehaviour {
             bannerRend.sprite = friendBanner;
             meterRend.sprite = friendMeter;
         }
+        leftCursor.transform.position = new Vector2(meterRend.bounds.min.x, leftCursor.transform.position.y);
+        rightCursor.transform.position = new Vector2(meterRend.bounds.max.x, leftCursor.transform.position.y);
     }
 }
