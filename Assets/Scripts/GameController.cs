@@ -3,8 +3,12 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
+    //GameController depends on these other controllers:
+    public PlayerController PlayerController;
+    public UIController UIController;
+
     public static bool isP1Turn;
-    public static int currentRelationshipScore = 0;
+    public static Relationship currentRelationshipScore = Relationship.acquaintance;
     public static int turnsRemaining = 6;
 
 	// Use this for initialization
@@ -36,6 +40,11 @@ public class GameController : MonoBehaviour {
 
     public static void updateScore(int incrementAmount) {
         currentRelationshipScore = currentRelationshipScore + incrementAmount;
+        if((int)currentRelationshipScore <- 0) {
+            currentRelationshipScore = Relationship.mortal;
+        } else if((int)currentRelationshipScore >= 5) {
+            currentRelationshipScore = Relationship.soulmate;
+        }
     }
 
     public void switchSetting() {

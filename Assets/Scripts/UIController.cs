@@ -4,49 +4,45 @@ using System.Collections;
 
 
 public class UIController : MonoBehaviour {
-    //Class variables:
+    //UIController depends on PlayerController.
+    public PlayerController PlayerController;
 
     public GameObject gameWrapper;
     public GameObject endWrapper;
     private static bool gameDisplayed = false;
 
+    public Image resultImage;
     //Button variables
     private Emote currentEmote;
-    private GameObject p1Button;
-    private GameObject p2Button;
+    public GameObject p1Button;
+    public GameObject p2Button;
 
     //StatusBar variables
     private SpriteRenderer iconRend;
     private SpriteRenderer bannerRend;
     private SpriteRenderer meterRend;
 
-    private Sprite enemyIcon;
-    private Sprite enemyBanner;
-    private Sprite enemyMeter;
-    private Sprite friendIcon;
-    private Sprite friendBanner;
-    private Sprite friendMeter;
-    private Sprite soulmateIcon;
-    private Sprite soulmateBanner;
-    private Sprite soulmateMeter;
-
     private GameObject leftCursor;
     private GameObject rightCursor;
+
+    public Sprite[] iconSprites;
+    public Sprite[] bannerSprites;
+    public Sprite[] meterSprites;
 
     //Game Text UI Variables
     private Text turnText;
     private Text turnsRemainingText;
 
     //Sprites for menu wheel
-    private Sprite[] menuSprites = new Sprite[6];
+    public Sprite[] menuSprites = new Sprite[6];
 
     void Start() {
         gameDisplayed = false;
     }
 
     void Update() {
-        if((int)PlayerController.gobzillaType != (int)PlayerType.unassigned && 
-            (int)PlayerController.biltonType != (int)PlayerType.unassigned && !gameDisplayed) {
+        if(PlayerController.GobzillaType() != PlayerType.unassigned && 
+            PlayerController.BiltonType() != PlayerType.unassigned && !gameDisplayed) {
             displayGame();
             gameDisplayed = true;
         } else if(GameController.turnsRemaining == 0) {
@@ -57,6 +53,7 @@ public class UIController : MonoBehaviour {
     void displayEnd() {
         gameWrapper.SetActive(false);
         endWrapper.SetActive(true);
+        resultImage.sprite = iconSprites[(int)GameController.currentRelationshipScore];
     }
 
     void displayGame() {
@@ -70,8 +67,6 @@ public class UIController : MonoBehaviour {
 
     void setVariables() {
         //Grab the objects from the game and assign them to class vars.
-        p1Button = GameObject.Find("P1EmoteMenuButton");
-        p2Button = GameObject.Find("P2EmoteMenuButton");
         GameObject currentTurn = GameObject.Find("CurrentTurn");
         turnText = currentTurn.GetComponent<Text>();
         GameObject turnsRemaining = GameObject.Find("TurnsRemaining");
@@ -84,31 +79,6 @@ public class UIController : MonoBehaviour {
         meterRend = meterObject.GetComponent<SpriteRenderer>();
         leftCursor = GameObject.Find("LeftCursor");
         rightCursor = GameObject.Find("RightCursor");
-
-        int arrayIndex = 1;
-        //Load corresponding sprites for menu buttons and sort into array.
-        foreach (string name in Emote.GetNames(typeof(Emote))) {
-            if (name != "neutral") {
-                string iconName = "Emotes/" + name + "_emote";
-                Sprite iconSprite = Resources.Load<Sprite>(iconName);
-                menuSprites[arrayIndex] = iconSprite;
-                arrayIndex++;
-            }
-            else {
-                menuSprites[0] = Resources.Load<Sprite>("Emotes/happy_emote");
-            }
-        }
-
-        //Load in StatusBar UI sprites
-        enemyIcon = Resources.Load<Sprite>("StatusBar/Icons/enemyIcon");
-        enemyBanner = Resources.Load<Sprite>("StatusBar/Banner/enemyBanner");
-        enemyMeter = Resources.Load<Sprite>("StatusBar/Meter/enemyMeter");
-        friendIcon = Resources.Load<Sprite>("StatusBar/Icons/friendIcon");
-        friendMeter = Resources.Load<Sprite>("StatusBar/Meter/friendMeter");
-        friendBanner = Resources.Load<Sprite>("StatusBar/Banner/friendBanner");
-        soulmateIcon = Resources.Load<Sprite>("StatusBar/Icons/soulmateIcon");
-        soulmateBanner = Resources.Load<Sprite>("StatusBar/Banner/soulmateBanner");
-        soulmateMeter = Resources.Load<Sprite>("StatusBar/Meter/soulmateMeter");
     }
 
     //Methods to toggle emote menu display.
@@ -139,23 +109,23 @@ public class UIController : MonoBehaviour {
         currentEmote = (Emote)emote;
     }
 
-    public void setP1Button(int emote) {
+    public void setP1Button(Emote emote) {
         Button button = p1Button.GetComponent<Button>();
-        button.image.sprite = menuSprites[emote];
+        button.image.sprite = menuSprites[(int)(emote)];
     }
 
-    public void setP2Button(int emote) {
+    public void setP2Button(Emote emote) {
         Button button = p2Button.GetComponent<Button>();
-        button.image.sprite = menuSprites[emote];
+        button.image.sprite = menuSprites[(int)emote];
     }
     //TODO: Separate concern.
     public void setP1Sprite() {
         //Make sure it's the correct player's turn.
         if(GameController.isP1Turn && currentEmote != Emote.neutral) {
             //Update UI image
-            setP1Button((int)currentEmote);
+            setP1Button(currentEmote);
             //Update player-based variables.
-            setP2Button(PlayerController.emoteResponse((int)currentEmote));
+            setP2Button(PlayerController.emoteResponse(currentEmote));
             currentEmote = Emote.neutral;
             //Update game logic dependent variables.
             //Can potentially move this from inside of UIController to in Editor OnClick().
@@ -171,9 +141,9 @@ public class UIController : MonoBehaviour {
         //Make sure it's the correct player's turn
         if (!GameController.isP1Turn && currentEmote != Emote.neutral) {
             //Update UI image
-            setP2Button((int)currentEmote);
+            setP2Button(currentEmote);
             //Update player-based variables.
-            setP1Button(PlayerController.emoteResponse((int)currentEmote));
+            setP1Button(PlayerController.emoteResponse(currentEmote));
             currentEmote = Emote.neutral;
             //Update game logic dependent variables.
             GameController.nextPlayerTurn();
@@ -184,19 +154,10 @@ public class UIController : MonoBehaviour {
     }
 
     private void updateStatusBar() {
-        if(GameController.currentRelationshipScore < -1) {
-            iconRend.sprite = enemyIcon;
-            bannerRend.sprite = enemyBanner;
-            meterRend.sprite = enemyMeter;
-        } else if (GameController.currentRelationshipScore > 1) {
-            iconRend.sprite = soulmateIcon;
-            bannerRend.sprite = soulmateBanner;
-            meterRend.sprite = soulmateMeter;
-        } else {
-            iconRend.sprite = friendIcon;
-            bannerRend.sprite = friendBanner;
-            meterRend.sprite = friendMeter;
-        }
+        int relationship = (int)GameController.currentRelationshipScore;
+        iconRend.sprite = iconSprites[relationship];
+        bannerRend.sprite = bannerSprites[relationship];
+        meterRend.sprite = meterSprites[relationship];
         leftCursor.transform.position = new Vector2(meterRend.bounds.min.x, leftCursor.transform.position.y);
         rightCursor.transform.position = new Vector2(meterRend.bounds.max.x, leftCursor.transform.position.y);
     }
