@@ -13,6 +13,8 @@ public class UIController : MonoBehaviour {
     private static bool gameDisplayed = false;
 
     public Image resultImage;
+    public Image resultBanner;
+
     //Button variables
     private Emote currentEmote;
     public GameObject p1Button;
@@ -64,6 +66,7 @@ public class UIController : MonoBehaviour {
         gameWrapper.SetActive(false);
         endWrapper.SetActive(true);
         resultImage.sprite = iconSprites[(int)GameController.currentRelationshipScore];
+        resultBanner.sprite = bannerSprites[(int)GameController.currentRelationshipScore];
     }
 
     void displayGame() {
