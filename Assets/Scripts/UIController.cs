@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 
@@ -16,7 +17,12 @@ public class UIController : MonoBehaviour {
     private Emote currentEmote;
     public GameObject p1Button;
     public GameObject p2Button;
+    public GameObject p1Menu;
+    public GameObject p2Menu;
 
+    private Button[] p1MenuButtons;
+    private Button[] p2MenuButtons;
+    private int selectedButton;
     //StatusBar variables
     private SpriteRenderer iconRend;
     private SpriteRenderer bannerRend;
@@ -26,6 +32,7 @@ public class UIController : MonoBehaviour {
     private GameObject rightCursor;
 
     public Sprite[] iconSprites;
+    public Sprite[] selectSprites;
     public Sprite[] bannerSprites;
     public Sprite[] meterSprites;
 
@@ -38,6 +45,9 @@ public class UIController : MonoBehaviour {
 
     void Start() {
         gameDisplayed = false;
+        p1MenuButtons = p1Menu.GetComponentsInChildren<Button>();
+        p2MenuButtons = p2Menu.GetComponentsInChildren<Button>();
+        selectedButton = -1;
     }
 
     void Update() {
@@ -109,6 +119,31 @@ public class UIController : MonoBehaviour {
         currentEmote = (Emote)emote;
     }
 
+    public void setSelectedButton(int emote) {
+        if (GameController.isP1Turn) {
+            if(selectedButton != -1) {
+                p1MenuButtons[selectedButton - 1].image.sprite = menuSprites[selectedButton];
+            }
+            selectedButton = emote;
+            p1MenuButtons[emote - 1].image.sprite = selectSprites[emote];
+        } else {
+            if (selectedButton != -1) {
+                p2MenuButtons[selectedButton - 1].image.sprite = menuSprites[selectedButton];
+            }
+            selectedButton = emote;
+            p2MenuButtons[emote - 1].image.sprite = selectSprites[emote];
+        }
+    }
+
+    public void resetMenu() {
+        if(GameController.isP1Turn) {
+            p1MenuButtons[selectedButton - 1].image.sprite = menuSprites[selectedButton];
+            selectedButton = -1;
+        } else {
+            p2MenuButtons[selectedButton - 1].image.sprite = menuSprites[selectedButton];
+            selectedButton = -1;
+        }
+    }
     public void setP1Button(Emote emote) {
         Button button = p1Button.GetComponent<Button>();
         button.image.sprite = menuSprites[(int)(emote)];
